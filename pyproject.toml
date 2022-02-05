@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "ffurf"
+version = "0.1.0"
+description = "Lightweight configuration library"
+authors = ["Sam Nicholls <sam@samnicholls.net>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+toml = "^0.10.2"
+rich = "^11.1.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
