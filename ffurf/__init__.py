@@ -43,6 +43,7 @@ class FfurfConfig:
     def __str__(self):
         return str({k: self.get_clean(k) for k in self})
 
+    # TODO test
     def __rich_console__(self, console, options):
         # Print as a nice table
         table = Table(title="Configuration", show_lines=False)
@@ -54,6 +55,9 @@ class FfurfConfig:
             if not self.config[k]["optional"] and self[k] is None:
                 v = "[b red]--------[/]"
                 source = "[b red]unset[/]"
+            elif not self.config[k]["optional"] and self[k] == "":
+                v = "[b red]--------[/]"
+                source = "[b red]blank[/]"
             else:
                 v = self.get_clean(k)
                 source = self.get_source(k)
