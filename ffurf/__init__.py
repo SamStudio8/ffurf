@@ -115,6 +115,8 @@ class FfurfConfig:
         for k, v in self.config.items():
             if v["value"] is None and not v["optional"]:
                 return False
+            if v["value"] is "" and not v["optional"] and v["type"] is str:
+                return False
         return True
 
     def set_config_key(self, key, value, source=None, append_source=False):
@@ -130,7 +132,7 @@ class FfurfConfig:
 
         if value is None:
             if not self.config[key]["optional"]:
-                raise Exception("%s cannot be null" % key)
+                raise TypeError("%s cannot be None" % key)
         else:
             try:
                 key_type = self.config[key]["type"]

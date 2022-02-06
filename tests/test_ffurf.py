@@ -210,7 +210,7 @@ def test_setitem_keyerror(basic_ffurf):
 
 
 def test_setitem_required_exception(basic_ffurf):
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         basic_ffurf["my-str"] = None
 
 
@@ -367,3 +367,8 @@ def test_update_key_append_source(basic_ffurf):
         "my-unset-key", "hoot", source="meow", append_source=True
     )
     assert basic_ffurf.config["my-unset-key"]["source"] == "hoot,meow"
+
+
+def test_empty_string_is_invalid(basic_ffurf):
+    basic_ffurf.set_config_key("my-unset-key", "", source="hoot")
+    assert not basic_ffurf.is_valid()
