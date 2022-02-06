@@ -30,13 +30,13 @@ will print the last N characters when printing or `rich` printing.
 
 Return a string that can be written out to a TOML file:
 
-```
+```python
 ffurf.to_toml()
 ```
 
 Return a string that can be written out to a dotenv file:
 
-``
+``python
 ffurf.to_env()
 ```
 
