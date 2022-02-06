@@ -28,9 +28,10 @@ will print the last N characters when printing or `rich` printing.
 
 ### Fill the configuration
 
-Load a configuration from your environment and/or disk:
+Load a configuration from your environment, disk, or any dict:
 
 ```python
+os.environ["MY_FIRST_KEY"] = "hoot"
 ffurf.from_env()
 ```
 
@@ -38,13 +39,26 @@ ffurf.from_env()
 ffurf.from_toml("my_configuration.toml")
 ```
 
-You can also set attributes of the configuration directly if you'd like:
+```python
+d = {"my_first_key": "hoot"}
+ffurf.from_dict(d)
+```
+
+You can also set values in the configuration directly if you'd like:
 
 ```python
 ffurf["my_first_key"] = "hoot"
 ```
 
-Setting a non-optional key to `None` will raise a `TypeError`.
+Values can also be set with the `set_config_key` helper:
+
+```python
+ffurf.set_config_key("my_first_key", "hoothoot", source="README example")
+```
+
+No matter how you set a key, setting a non-optional key to `None` will
+raise a `TypeError`. Setting a key that is not in the configuration will
+raise a `KeyError`.
 
 ### Validate the configuration
 
@@ -53,3 +67,40 @@ ffurf.is_valid()
 ```
 
 Currently this will only check that all required keys have been filled.
+
+### Access the configuration
+
+You can access the configuration like a dictionary (because it is):
+
+```python
+ffurf["my_first_key"]
+```
+
+If you think you might want to fetch a key that might not be in the configuration,
+use `get`; just like a dictionary:
+
+```python
+ffurf.get("my_first_key", default=None)
+```
+
+You can also get "cleaned" versions of the values which will mask out secrets
+and partial secrets:
+
+```python
+ffurf.get_clean("my_secret_key")
+```
+
+### Print the configuration
+
+Print the configuration as a secret-sanitised dict:
+
+```python
+print(ffurf)
+```
+
+Print the configuration into a pretty, secret-sanitised table:
+
+```python
+from rich import print as rich_print
+rich_print(ffurf)
+```
