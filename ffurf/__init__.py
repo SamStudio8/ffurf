@@ -178,11 +178,19 @@ class FfurfConfig:
         return toml.dumps({k: self.get(k, default="") for k in self})
 
     # TODO test
+    def to_json(self, default=""):
+        return json.dumps({k: self.get(k, default="") for k in self})
+
+    # TODO test
     def to_env(self, default=""):
         env_lines = []
         for k in self:
             env_lines.append('%s="%s"' % (self.key_to_envkey(k), str(self[k])))
         return "\n".join(env_lines)
+
+    # TODO test
+    def to_dictstr(self, default=""):
+        return str({k: self.get(k, default="") for k in self})
 
     def from_toml(self, toml_fp, profile=None):
         if not os.path.exists(toml_fp):
@@ -191,3 +199,12 @@ class FfurfConfig:
 
         toml_config = toml.load(toml_fp)
         self._from_dict(toml_config, source=toml_fp)
+
+    # TODO test
+    def from_json(self, json_fp, profile=None):
+        if not os.path.exists(json_fp):
+            sys.stderr.write("Could not open json: %s\n" % json_fp)
+            raise OSError()
+
+        json_config = json.load(json_fp)
+        self._from_dict(json_config, source=json_fp)
