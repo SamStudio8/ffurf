@@ -28,8 +28,8 @@ class FfurfConfig:
         self.config[key] = {
             "name": key,
             "type": key_type,
-            "value": key_type(default_value) if default_value else None,
-            "source": "ffurf:default" if default_value else None,
+            "value": key_type(default_value) if default_value is not None else None,
+            "source": "ffurf:default" if default_value is not None else None,
             "secret": secret,
             "partial_secret": partial_secret if not secret else None,
             "optional": optional,
