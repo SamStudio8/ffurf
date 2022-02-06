@@ -75,7 +75,11 @@ class FfurfConfig:
         return k in self.config_keys
 
     def get(self, k, default=None):
-        return self.config.get(k, {"value": default})["value"]
+        v = self.config.get(k, {"value": default})["value"]
+        if v:
+            return v
+        else:
+            return default
 
     def get_keyconf(self, k):
         if k not in self.config_keys:
@@ -90,6 +94,10 @@ class FfurfConfig:
     def get_clean(self, k):
         if k not in self.config_keys:
             raise KeyError(k)
+
+        # TODO test
+        if not self[k]:
+            return ""
 
         if self.config[k]["secret"]:
             return "********"
@@ -164,6 +172,17 @@ class FfurfConfig:
             env_v = os.getenv(env_k)
             if env_v:
                 self._from_dict({k: env_v}, "env:%s" % env_k)
+
+    # TODO test
+    def to_toml(self, default=""):
+        return toml.dumps({k: self.get(k, default="") for k in self})
+
+    # TODO test
+    def to_env(self, default=""):
+        env_lines = []
+        for k in self:
+            env_lines.append('%s="%s"' % (self.key_to_envkey(k), str(self[k])))
+        return "\n".join(env_lines)
 
     def from_toml(self, toml_fp, profile=None):
         if not os.path.exists(toml_fp):

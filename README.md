@@ -26,6 +26,21 @@ Keys can be marked as secret, which means that printing or `rich` printing the
 configuration will hide them. Keys can also be marked as partial_secret, which
 will print the last N characters when printing or `rich` printing.
 
+### Export the configuration template
+
+Return a string that can be written out to a TOML file:
+
+```
+ffurf.to_toml()
+```
+
+Return a string that can be written out to a dotenv file:
+
+``
+ffurf.to_env()
+```
+
+
 ### Fill the configuration
 
 Load a configuration from your environment, disk, or any dict:
@@ -77,11 +92,15 @@ ffurf["my_first_key"]
 ```
 
 If you think you might want to fetch a key that might not be in the configuration,
-use `get`; just like a dictionary:
+or might be unset, use `get`; like a dictionary:
 
 ```python
 ffurf.get("my_first_key", default=None)
 ```
+
+The default will be applied in the case where the key is not in the configuration,
+or when the key is in the configuration but has not been set. The latter is useful
+when printing out empty configurations.
 
 You can also get "cleaned" versions of the values which will mask out secrets
 and partial secrets:
