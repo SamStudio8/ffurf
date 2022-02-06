@@ -207,5 +207,6 @@ class FfurfConfig:
             sys.stderr.write("Could not open json: %s\n" % json_fp)
             raise OSError()
 
-        json_config = json.load(json_fp)
+        with open(json_fp) as json_fh:
+            json_config = json.load(json_fp)
         self._from_dict(json_config, source=json_fp)
