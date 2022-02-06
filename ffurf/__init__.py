@@ -97,7 +97,7 @@ class FfurfConfig:
             raise KeyError(k)
 
         # TODO test
-        if not self[k]:
+        if self[k] is None:
             return ""
 
         if self.config[k]["secret"]:
