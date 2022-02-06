@@ -139,10 +139,9 @@ class FfurfConfig:
             if k in d:
                 self.set_config_key(k, d[k], "%s" % source)
 
-            if d.get("default"):
-                # Load key from default config
-                if k in d.get("default"):
-                    self.set_config_key(k, d["default"][k], "%s:default" % source)
+            # Load key from default config
+            if k in d.get("default", {}):
+                self.set_config_key(k, d["default"][k], "%s:default" % source)
 
             if profile:
                 # Allow profile to override top level config
