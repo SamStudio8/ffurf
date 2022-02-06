@@ -77,10 +77,9 @@ class FfurfConfig:
 
     def get(self, k, default=None):
         v = self.config.get(k, {"value": default})["value"]
-        if v:
-            return v
-        else:
+        if v is None:
             return default
+        return v
 
     def get_keyconf(self, k):
         if k not in self.config_keys:
