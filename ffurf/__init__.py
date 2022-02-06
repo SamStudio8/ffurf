@@ -154,13 +154,13 @@ class FfurfConfig:
                     )
 
     # def from_env(self):
-    #    env_d = {k : os.getenv(v) for k in self.config if os.getenv(v)}
+    #    env_d = {k : os.getenv(k) for k in self.config if os.getenv(k)}
     #    self._from_dict(env_d, "env")
 
-    # def from_toml(self, toml_fp, profile=None):
-    #    if not os.path.exists(toml_fp):
-    #        sys.stderr.write("Could not open toml: %s\n" % toml_fp)
-    #        raise Exception()
-    #
-    #    toml_config = toml.load(toml_fp)
-    #    self._from_dict(toml_config, source=toml_fp)
+    def from_toml(self, toml_fp, profile=None):
+        if not os.path.exists(toml_fp):
+            sys.stderr.write("Could not open toml: %s\n" % toml_fp)
+            raise OSError()
+
+        toml_config = toml.load(toml_fp)
+        self._from_dict(toml_config, source=toml_fp)

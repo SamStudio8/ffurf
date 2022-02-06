@@ -1,4 +1,5 @@
 import pytest
+import toml
 
 from ffurf import FfurfConfig
 
@@ -37,6 +38,58 @@ def partial_secret_ffurf():
     ffurf.add_config_key("my-secret", partial_secret=4)
     ffurf.set_config_key("my-secret", "thisisverysecrethoot")
     return ffurf
+
+
+@pytest.fixture
+def test_config_root():
+    return {
+        "my-str": "hoot",
+        "my-int": 100,
+    }
+
+
+@pytest.fixture
+def test_config_default():
+    return {
+        "my-str": "meow",
+        "default": {
+            "my-str": "hoot",
+            "my-int": 100,
+        },
+    }
+
+
+@pytest.fixture
+def test_config_profile():
+    return {
+        "my-str": "meow",
+        "default": {
+            "my-str": "meow",
+            "my-int": -100,
+        },
+        "profile": {
+            "sam": {
+                "my-str": "hoot",
+                "my-int": 100,
+            },
+        },
+    }
+
+
+@pytest.fixture
+def toml_config_root(tmpdir_factory, test_config_root):
+    toml_fp = str(tmpdir_factory.mktemp("test_data").join("myconf.toml"))
+    with open(toml_fp, "w") as fh:
+        toml.dump(test_config_root, fh)
+    return toml_fp
+
+
+@pytest.fixture
+def toml_config_default(tmpdir_factory, test_config_default):
+    toml_fp = str(tmpdir_factory.mktemp("test_data").join("myconf.toml"))
+    with open(toml_fp, "w") as fh:
+        toml.dump(test_config_default, fh)
+    return toml_fp
 
 
 def _assert_config(ffurf, key, key_type, value, source=None, source_contains=None):
@@ -247,54 +300,54 @@ def test_valid_unset_optional_ffurf():
     assert ffurf.is_valid()
 
 
-def test_values_from_root_dict(fill_ffurf):
-    config_dict = {
-        "my-str": "hoot",
-        "my-int": 100,
-    }
-    fill_ffurf.from_dict(config_dict)
+def test_values_from_root_dict(fill_ffurf, test_config_root):
+    fill_ffurf.from_dict(test_config_root)
 
-    for k, v in config_dict.items():
+    for k, v in test_config_root.items():
         assert fill_ffurf[k] == v
         assert "src" in fill_ffurf.config[k]["source"]
     assert fill_ffurf.is_valid()
 
 
-def test_values_from_default_dict_override_root(fill_ffurf):
-    config_dict = {
-        "my-str": "meow",
-        "default": {
-            "my-str": "hoot",
-            "my-int": 100,
-        },
-    }
-    fill_ffurf.from_dict(config_dict)
+def test_values_from_default_dict_override_root(fill_ffurf, test_config_default):
+    fill_ffurf.from_dict(test_config_default)
 
-    for k, v in config_dict["default"].items():
+    for k, v in test_config_default["default"].items():
         assert fill_ffurf[k] == v
         assert "src" in fill_ffurf.config[k]["source"]
         assert "default" in fill_ffurf.config[k]["source"]
     assert fill_ffurf.is_valid()
 
 
-def test_values_from_profile_dict_override_default_and_root(fill_ffurf):
-    config_dict = {
-        "my-str": "meow",
-        "default": {
-            "my-str": "meow",
-            "my-int": -100,
-        },
-        "profile": {
-            "sam": {
-                "my-str": "hoot",
-                "my-int": 100,
-            },
-        },
-    }
-    fill_ffurf.from_dict(config_dict, profile="sam")
+def test_values_from_profile_dict_override_default_and_root(
+    fill_ffurf, test_config_profile
+):
+    fill_ffurf.from_dict(test_config_profile, profile="sam")
 
-    for k, v in config_dict["profile"]["sam"].items():
+    for k, v in test_config_profile["profile"]["sam"].items():
         assert fill_ffurf[k] == v
         assert "src" in fill_ffurf.config[k]["source"]
         assert "profile.sam" in fill_ffurf.config[k]["source"]
+    assert fill_ffurf.is_valid()
+
+
+def test_exception_from_missing_toml(fill_ffurf):
+    with pytest.raises(OSError):
+        fill_ffurf.from_toml("missing.toml")
+
+
+# Not going to test the TOML values as we would just be testing that the toml
+# library is working, given we just hand it over to _from_dict which is tested
+def test_values_from_root_toml(fill_ffurf, toml_config_root, test_config_root):
+    fill_ffurf.from_toml(toml_config_root)
+    assert fill_ffurf.is_valid()
+
+
+def test_values_from_default_toml(fill_ffurf, toml_config_root, test_config_default):
+    fill_ffurf.from_toml(toml_config_root)
+    assert fill_ffurf.is_valid()
+
+
+def test_values_from_profile_toml(fill_ffurf, toml_config_root, test_config_profile):
+    fill_ffurf.from_toml(toml_config_root, profile="sam")
     assert fill_ffurf.is_valid()
