@@ -1,6 +1,7 @@
 # ffurf
 
 Pronounced "furv" after the Welsh word for "form" or "shape" (and short for the much longer and harder to say Welsh word for configuration), `ffurf` is a very lightweight Python library for defining and loading simple configurations.
+`ffurf` will work as a drop-in replacement for any use-case where you're reading and writing configuration data to and from a `dict`, because it is just a dictionary with some extra utility functions.
 `ffurf` is yet another configuration parser and is just a cleaned up version of the code I write over and over for small projects. There is almost certainly [a bigger and better library](http://dynaconf.com/) but I make `ffurf` available in the hope it might be useful to someone who wants a small and non-intrusive way to handle very simple configurations.
 
 ## How do I use it?
@@ -28,10 +29,11 @@ will print the last N characters when printing or `rich` printing.
 
 ### Export the configuration template
 
-Return a string that can be written out to a TOML file:
+Return a string that can be written out to a file:
 
 ```python
 ffurf.to_toml()
+ffurf.to_json()
 ```
 
 Return a string that can be written out to a dotenv file:
@@ -52,6 +54,7 @@ ffurf.from_env()
 
 ```python
 ffurf.from_toml("my_configuration.toml")
+ffurf.from_json("my_configuration.json")
 ```
 
 ```python
