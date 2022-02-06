@@ -51,7 +51,14 @@ class FfurfConfig:
         table.add_column("Source")
 
         for k in self:
-            table.add_row(k, self.get_clean(k), self.get_source(k))
+            if not self.config[k]["optional"] and self[k] is None:
+                v = "[b red]--------[/]"
+                source = "[b red]unset[/]"
+            else:
+                v = self.get_clean(k)
+                source = self.get_source(k)
+
+            table.add_row(k, v, source)
 
         yield table
 
