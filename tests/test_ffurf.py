@@ -269,19 +269,26 @@ def test_get(basic_ffurf):
     assert basic_ffurf.get("my-str") == "hoot"
 
 
-# TODO expand and check values you lazy sod
 def test_get_keyconf(basic_ffurf):
     keyconf = basic_ffurf.get_keyconf("my-str")
-    for k in [
-        "name",
-        "optional",
-        "partial_secret",
-        "secret",
-        "source",
-        "value",
-        "type",
-    ]:
-        assert k in keyconf
+    assert keyconf["name"] == "my-str"
+    assert not keyconf["optional"]
+    assert not keyconf["partial_secret"]
+    assert not keyconf["secret"]
+    assert "src" in keyconf["source"]
+    assert keyconf["value"] == "hoot"
+    assert keyconf["type"] == str
+
+
+def test_get_keyconf(basic_ffurf):
+    keyconf = basic_ffurf.get_keyconf("my-int")
+    assert keyconf["name"] == "my-int"
+    assert not keyconf["optional"]
+    assert not keyconf["partial_secret"]
+    assert not keyconf["secret"]
+    assert "src" in keyconf["source"]
+    assert keyconf["value"] == 800
+    assert keyconf["type"] == int
 
 
 def test_get_key_not_overwritten_by_default(basic_ffurf):
