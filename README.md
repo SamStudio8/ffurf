@@ -36,7 +36,7 @@ ffurf.to_toml()
 
 Return a string that can be written out to a dotenv file:
 
-``python
+```python
 ffurf.to_env()
 ```
 
