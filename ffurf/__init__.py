@@ -6,13 +6,20 @@ from inspect import currentframe, getframeinfo
 
 from rich.table import Table
 
+
 class FfurfConfig:
     def __init__(self):
         self.config = {}
         self.config_keys = set([])
 
     def add_config_key(
-        self, key, key_type=str, default_value=None, secret=False, partial_secret=None, optional=False,
+        self,
+        key,
+        key_type=str,
+        default_value=None,
+        secret=False,
+        partial_secret=None,
+        optional=False,
     ):
 
         self.config[key] = {
@@ -52,7 +59,7 @@ class FfurfConfig:
 
     def __setitem__(self, k, v):
         frameinfo = getframeinfo(currentframe().f_back)
-        source = "src:%s.%d" %(frameinfo.filename, frameinfo.lineno)
+        source = "src:%s.%d" % (frameinfo.filename, frameinfo.lineno)
         return self.set_config_key(k, v, source)
 
     def __iter__(self):
@@ -97,7 +104,7 @@ class FfurfConfig:
     def set_config_key(self, key, value, source=None):
         if not source:
             frameinfo = getframeinfo(currentframe().f_back)
-            source = "src:%s.%d" %(frameinfo.filename, frameinfo.lineno)
+            source = "src:%s.%d" % (frameinfo.filename, frameinfo.lineno)
 
         if key not in self.config:
             raise KeyError(key)
@@ -121,7 +128,7 @@ class FfurfConfig:
 
     def from_dict(self, d, source="src", profile=None):
         frameinfo = getframeinfo(currentframe().f_back)
-        source = "src:%s.%d" %(frameinfo.filename, frameinfo.lineno)
+        source = "src:%s.%d" % (frameinfo.filename, frameinfo.lineno)
         return self._from_dict(d, source=source, profile=profile)
 
     def _from_dict(self, d, source="src", profile=None):
@@ -137,7 +144,6 @@ class FfurfConfig:
                 if k in d:
                     self.set_config_key(k, d[k], "%s" % source)
 
-
             if profile:
                 # Allow profile to override top level config
                 if k in d.get("profile", {}).get(profile):
@@ -147,15 +153,14 @@ class FfurfConfig:
                         "%s:profile.%s" % (source, profile),
                     )
 
-    #def from_env(self):
+    # def from_env(self):
     #    env_d = {k : os.getenv(v) for k in self.config if os.getenv(v)}
     #    self._from_dict(env_d, "env")
 
-    #def from_toml(self, toml_fp, profile=None):
+    # def from_toml(self, toml_fp, profile=None):
     #    if not os.path.exists(toml_fp):
     #        sys.stderr.write("Could not open toml: %s\n" % toml_fp)
     #        raise Exception()
     #
     #    toml_config = toml.load(toml_fp)
     #    self._from_dict(toml_config, source=toml_fp)
-

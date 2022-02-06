@@ -2,6 +2,7 @@ import pytest
 
 from ffurf import FfurfConfig
 
+
 @pytest.fixture
 def basic_ffurf():
     ffurf = FfurfConfig()
@@ -13,12 +14,14 @@ def basic_ffurf():
     ffurf.set_config_key("my-int", 800)
     return ffurf
 
+
 @pytest.fixture
 def secret_ffurf():
     ffurf = FfurfConfig()
     ffurf.add_config_key("my-secret", secret=True)
     ffurf.set_config_key("my-secret", "hoot")
     return ffurf
+
 
 @pytest.fixture
 def fill_ffurf():
@@ -27,12 +30,14 @@ def fill_ffurf():
     ffurf.add_config_key("my-int", key_type=int)
     return ffurf
 
+
 @pytest.fixture
 def partial_secret_ffurf():
     ffurf = FfurfConfig()
     ffurf.add_config_key("my-secret", partial_secret=4)
     ffurf.set_config_key("my-secret", "thisisverysecrethoot")
     return ffurf
+
 
 def _assert_config(ffurf, key, key_type, value, source=None, source_contains=None):
     assert key in ffurf.config
@@ -45,8 +50,10 @@ def _assert_config(ffurf, key, key_type, value, source=None, source_contains=Non
     if source_contains:
         assert source_contains in ffurf.config[key]["source"]
 
+
 def test_init_ffurf():
     FfurfConfig()
+
 
 def test_add_config_key():
     ffurf = FfurfConfig()
@@ -60,19 +67,25 @@ def test_add_config_key():
     assert not ffurf.config["my-key"]["partial_secret"]
     assert not ffurf.config["my-key"]["optional"]
 
+
 def test_add_config_key_default_value():
     ffurf = FfurfConfig()
     ffurf.add_config_key("my-key", default_value="hoot")
-    _assert_config(ffurf, key="my-key", key_type=str, value="hoot", source="ffurf:default")
+    _assert_config(
+        ffurf, key="my-key", key_type=str, value="hoot", source="ffurf:default"
+    )
+
 
 def test_add_config_key_type_int():
     ffurf = FfurfConfig()
     ffurf.add_config_key("my-key", int, default_value="100")
     _assert_config(ffurf, key="my-key", key_type=int, value=100, source="ffurf:default")
 
+
 def test_contains(basic_ffurf):
     assert "my-str" in basic_ffurf
     assert "no-key" not in basic_ffurf
+
 
 def test_iter():
     ffurf = FfurfConfig()
@@ -87,13 +100,28 @@ def test_iter():
     with pytest.raises(StopIteration):
         next(it)
 
+
 def test_set_config(basic_ffurf):
     basic_ffurf.set_config_key("my-unset-key", "hoot")
-    _assert_config(basic_ffurf, key="my-unset-key", key_type=str, value="hoot", source_contains="src:")
+    _assert_config(
+        basic_ffurf,
+        key="my-unset-key",
+        key_type=str,
+        value="hoot",
+        source_contains="src:",
+    )
+
 
 def test_setitem(basic_ffurf):
     basic_ffurf["my-unset-key"] = "hoot"
-    _assert_config(basic_ffurf, key="my-unset-key", key_type=str, value="hoot", source_contains="src:")
+    _assert_config(
+        basic_ffurf,
+        key="my-unset-key",
+        key_type=str,
+        value="hoot",
+        source_contains="src:",
+    )
+
 
 def test_set_config_keyerror(basic_ffurf):
     with pytest.raises(KeyError):
@@ -101,92 +129,123 @@ def test_set_config_keyerror(basic_ffurf):
     assert "no-key" not in basic_ffurf.config
     assert "no-key" not in basic_ffurf.config_keys
 
+
 def test_setitem_keyerror(basic_ffurf):
     with pytest.raises(KeyError):
         basic_ffurf["no-key"] = 1
     assert "no-key" not in basic_ffurf.config
     assert "no-key" not in basic_ffurf.config_keys
 
+
 def test_setitem_required_exception(basic_ffurf):
     with pytest.raises(Exception):
         basic_ffurf["my-str"] = None
+
 
 def test_getitem(basic_ffurf):
     assert basic_ffurf["my-str"] == "hoot"
     assert basic_ffurf["my-int"] == 800
 
+
 def test_getitem_keyerror(basic_ffurf):
     with pytest.raises(KeyError):
         basic_ffurf["no-key"]
+
 
 def test_get_clean_keyerror(basic_ffurf):
     with pytest.raises(KeyError):
         basic_ffurf.get_clean("no-key")
 
+
 def test_get_keyconf_keyerror(basic_ffurf):
     with pytest.raises(KeyError):
         basic_ffurf.get_keyconf("no-key")
 
+
 def test_secret_get_reveals_key(secret_ffurf):
     assert secret_ffurf.get("my-secret") == "hoot"
 
+
 def test_secret_getitem_reveals_key(secret_ffurf):
     assert secret_ffurf["my-secret"] == "hoot"
+
 
 def test_secret_print_hides_key(secret_ffurf):
     assert "hoot" not in str(secret_ffurf)
     assert "********" in str(secret_ffurf)
 
+
 def test_secret_get_clean_hides_key(secret_ffurf):
     assert secret_ffurf.get_clean("my-secret") == "********"
+
 
 def test_partial_secret_get_reveals_key(partial_secret_ffurf):
     assert partial_secret_ffurf.get("my-secret") == "thisisverysecrethoot"
 
+
 def test_partial_secret_getitem_reveals_key(partial_secret_ffurf):
     assert partial_secret_ffurf["my-secret"] == "thisisverysecrethoot"
+
 
 def test_partial_secret_print_hides_key(partial_secret_ffurf):
     assert "hoot" in str(partial_secret_ffurf)
     assert "thisisverysecret" not in str(partial_secret_ffurf)
     assert "********hoot" in str(partial_secret_ffurf)
 
+
 def test_partial_secret_get_clean_hides_key(partial_secret_ffurf):
     assert partial_secret_ffurf.get_clean("my-secret") == "********hoot"
+
 
 def test_getitem(basic_ffurf):
     assert basic_ffurf["my-str"] == "hoot"
     assert basic_ffurf["my-int"] == 800
 
+
 def test_get(basic_ffurf):
     assert basic_ffurf.get("my-str") == "hoot"
+
 
 # TODO expand and check values you lazy sod
 def test_get_keyconf(basic_ffurf):
     keyconf = basic_ffurf.get_keyconf("my-str")
-    for k in ["name", "optional", "partial_secret", "secret", "source", "value", "type"]:
+    for k in [
+        "name",
+        "optional",
+        "partial_secret",
+        "secret",
+        "source",
+        "value",
+        "type",
+    ]:
         assert k in keyconf
+
 
 def test_get_key_not_overwritten_by_default(basic_ffurf):
     assert basic_ffurf.get("my-str", default="meow") == "hoot"
 
+
 def test_get_nokey_returns_default(basic_ffurf):
     assert basic_ffurf.get("no-key", default="hoot") == "hoot"
+
 
 def test_invalid_blank_ffurf():
     # Empty config technically valid
     ffurf = FfurfConfig()
     assert ffurf.is_valid()
 
+
 def test_invalid_unset_required_ffurf():
     ffurf = FfurfConfig()
     ffurf.add_config_key("my-key")
     assert not ffurf.is_valid()
 
+
 def test_valid_unset_optional_ffurf():
     ffurf = FfurfConfig()
     ffurf.add_config_key("my-key", optional=True)
     assert ffurf.is_valid()
+
 
 def test_values_from_root_dict(fill_ffurf):
     config_dict = {
@@ -199,6 +258,7 @@ def test_values_from_root_dict(fill_ffurf):
         assert fill_ffurf[k] == v
         assert "src" in fill_ffurf.config[k]["source"]
     assert fill_ffurf.is_valid()
+
 
 def test_values_from_default_dict_override_root(fill_ffurf):
     config_dict = {
@@ -216,12 +276,13 @@ def test_values_from_default_dict_override_root(fill_ffurf):
         assert "default" in fill_ffurf.config[k]["source"]
     assert fill_ffurf.is_valid()
 
+
 def test_values_from_profile_dict_override_default_and_root(fill_ffurf):
     config_dict = {
         "my-str": "meow",
         "default": {
-                "my-str": "meow",
-                "my-int": -100,
+            "my-str": "meow",
+            "my-int": -100,
         },
         "profile": {
             "sam": {
