@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ffurf"
-version = "0.1.0"
+version = "0.1.4"
 description = "Lightweight configuration library"
 authors = ["Sam Nicholls <sam@samnicholls.net>"]
 license = "MIT"

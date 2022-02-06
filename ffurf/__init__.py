@@ -1,4 +1,4 @@
-__VERSION__ = "0.0.2"
+__VERSION__ = "0.1.4"
 
 import toml
 import json
