@@ -135,14 +135,14 @@ class FfurfConfig:
 
         for k in self.config:
 
+            # Try and get key from the root
+            if k in d:
+                self.set_config_key(k, d[k], "%s" % source)
+
             if d.get("default"):
                 # Load key from default config
                 if k in d.get("default"):
                     self.set_config_key(k, d["default"][k], "%s:default" % source)
-            else:
-                # Try and get key from the root
-                if k in d:
-                    self.set_config_key(k, d[k], "%s" % source)
 
             if profile:
                 # Allow profile to override top level config

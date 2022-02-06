@@ -360,6 +360,7 @@ def test_key_to_envkey():
 
 
 # Use monkeypatch to safely fiddle with env
+# Only test root env as we don't support anything more clever
 def test_values_from_env(fill_ffurf, test_config_root, monkeypatch):
 
     for k, v in test_config_root.items():
