@@ -37,10 +37,10 @@ class FfurfConfig:
 
     def __repr__(self):
         # TODO String for making the Ffurf class
-        return str({k: self.get_clean(k) for k in self.config})
+        return str({k: self.get_clean(k) for k in self})
 
     def __str__(self):
-        return str({k: self.get_clean(k) for k in self.config})
+        return str({k: self.get_clean(k) for k in self})
 
     def __rich_console__(self, console, options):
         # Print as a nice table
