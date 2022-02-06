@@ -9,7 +9,7 @@ Pronounced "furv" after the Welsh word for "form" or "shape" (and short for the 
 
 Initialise a `FfurfConfig` and add the settings you want it to hold:
 
-```
+```python
 from ffurf import FfurfConfig
 
 ffurf = FfurfConfig()
@@ -30,17 +30,17 @@ will print the last N characters when printing or `rich` printing.
 
 Load a configuration from your environment and/or disk:
 
-```
+```python
 ffurf.from_env()
 ```
 
-```
+```python
 ffurf.from_toml("my_configuration.toml")
 ```
 
 You can also set attributes of the configuration directly if you'd like:
 
-```
+```python
 ffurf["my_first_key"] = "hoot"
 ```
 
@@ -48,7 +48,7 @@ Setting a non-optional key to `None` will raise a `TypeError`.
 
 ### Validate the configuration
 
-```
+```python
 ffurf.is_valid()
 ```
 
