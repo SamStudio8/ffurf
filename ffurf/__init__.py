@@ -95,7 +95,6 @@ class FfurfConfig:
         if k not in self.config_keys:
             raise KeyError(k)
 
-        # TODO test
         if self[k] is None:
             return ""
 

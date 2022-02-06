@@ -10,6 +10,8 @@ def basic_ffurf():
     ffurf.add_config_key("my-str")
     ffurf.add_config_key("my-int", key_type=int)
     ffurf.add_config_key("my-unset-key")
+    ffurf.add_config_key("my-zero", key_type=int, default_value=0)
+    ffurf.add_config_key("one-to-zero", key_type=int, default_value=1)
 
     ffurf.set_config_key("my-str", "hoot")
     ffurf.set_config_key("my-int", 800)
@@ -135,6 +137,12 @@ def test_add_config_key_type_int():
     _assert_config(ffurf, key="my-key", key_type=int, value=100, source="ffurf:default")
 
 
+def test_add_config_key_zero_ok(basic_ffurf):
+    _assert_config(
+        basic_ffurf, key="my-zero", key_type=int, value=0, source="ffurf:default"
+    )
+
+
 def test_contains(basic_ffurf):
     assert "my-str" in basic_ffurf
     assert "no-key" not in basic_ffurf
@@ -195,9 +203,35 @@ def test_setitem_required_exception(basic_ffurf):
         basic_ffurf["my-str"] = None
 
 
+def test_can_set_nonoptional_key_to_untruth(basic_ffurf):
+    basic_ffurf["my-zero"] = 0
+
+
+def test_can_set_key_to_untruth(basic_ffurf):
+    basic_ffurf["one-to-zero"] = 0
+    assert basic_ffurf["one-to-zero"] == 0
+
+
 def test_getitem(basic_ffurf):
     assert basic_ffurf["my-str"] == "hoot"
     assert basic_ffurf["my-int"] == 800
+
+
+def test_default_zero_getitem(basic_ffurf):
+    assert basic_ffurf["my-zero"] == 0
+    assert basic_ffurf["my-zero"] == 0
+
+
+def test_default_zero_not_overwritten_by_getclean_default(basic_ffurf):
+    assert basic_ffurf.get_clean("my-zero") == "0"
+
+
+def test_unset_key_is_empty_string_for_getclean(basic_ffurf):
+    assert basic_ffurf.get_clean("my-unset-key") == ""
+
+
+def test_default_zero_not_overwritten_by_get_default(basic_ffurf):
+    assert basic_ffurf.get("my-zero", default=1) == 0
 
 
 def test_getitem_keyerror(basic_ffurf):
