@@ -154,7 +154,7 @@ class FfurfConfig:
 
             if profile:
                 # Allow profile to override top level config
-                if k in d.get("profile", {}).get(profile):
+                if k in d.get("profile", {}).get(profile, {}):
                     self.set_config_key(
                         k,
                         d["profile"][profile][k],
@@ -197,7 +197,7 @@ class FfurfConfig:
             raise OSError()
 
         toml_config = toml.load(toml_fp)
-        self._from_dict(toml_config, source=toml_fp)
+        self._from_dict(toml_config, source=toml_fp, profile=profile)
 
     # TODO test
     def from_json(self, json_fp, profile=None):
