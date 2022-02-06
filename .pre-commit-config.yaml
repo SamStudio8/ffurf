@@ -1,0 +1,20 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-added-large-files
+-  repo: https://github.com/SamStudio8/pre-commit-assert-changelog
+   rev: 0f0fd2fe45651c3fb4ead6f3d08d881195ea77dc
+   hooks:
+   -   id: assert-changelog-version
+       args: [--version-mod=ffurf/__init__.py]
+   -   id: assert-changelog-contents
+       args: [--backtick-prefixes=ffurf,--package-dir-name=ffurf]
+-   repo: https://github.com/psf/black
+    rev: '22.1.0'
+    hooks:
+    -   id: black
