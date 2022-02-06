@@ -199,7 +199,6 @@ class FfurfConfig:
         toml_config = toml.load(toml_fp)
         self._from_dict(toml_config, source=toml_fp, profile=profile)
 
-    # TODO test
     def from_json(self, json_fp, profile=None):
         if not os.path.exists(json_fp):
             sys.stderr.write("Could not open json: %s\n" % json_fp)
@@ -207,4 +206,4 @@ class FfurfConfig:
 
         with open(json_fp) as json_fh:
             json_config = json.load(json_fh)
-        self._from_dict(json_config, source=json_fp)
+        self._from_dict(json_config, source=json_fp, profile=profile)

@@ -18,6 +18,15 @@ def basic_ffurf():
 
 
 @pytest.fixture
+def tiered_ffurf():
+    ffurf = FfurfConfig()
+    ffurf.add_config_key("root-key", key_type=int)
+    ffurf.add_config_key("default-key", key_type=int)
+    ffurf.add_config_key("profile-key", key_type=int)
+    return ffurf
+
+
+@pytest.fixture
 def secret_ffurf():
     ffurf = FfurfConfig()
     ffurf.add_config_key("my-secret", secret=True)
@@ -75,6 +84,31 @@ def test_config_profile():
             },
         },
     }
+
+
+@pytest.fixture
+def test_config_tiers():
+    in_d = {
+        "root-key": 1,
+        "default-key": 1,
+        "profile-key": 1,
+        "default": {
+            "default-key": 2,
+            "profile-key": 2,
+        },
+        "profile": {
+            "sam": {
+                "profile-key": 3,
+            },
+        },
+    }
+
+    out_d = {
+        "root-key": 1,
+        "default-key": 2,
+        "profile-key": 3,
+    }
+    return in_d, out_d
 
 
 def _assert_config(ffurf, key, key_type, value, source=None, source_contains=None):
@@ -356,3 +390,10 @@ def test_values_from_profile_dict_override_default_and_root(
         assert "src" in fill_ffurf.config[k]["source"]
         assert "profile.sam" in fill_ffurf.config[k]["source"]
     assert fill_ffurf.is_valid()
+
+
+def test_values_are_correctly_overriden_better_than_before(
+    tiered_ffurf, test_config_tiers
+):
+    tiered_ffurf.from_dict(test_config_tiers[0], profile="sam")
+    _assert_config_values(tiered_ffurf, test_config_tiers[1])
