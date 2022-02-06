@@ -106,7 +106,7 @@ class FfurfConfig:
 
     def is_valid(self):
         for k, v in self.config.items():
-            if not v["value"] and not v["optional"]:
+            if v["value"] is None and not v["optional"]:
                 return False
         return True
 

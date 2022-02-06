@@ -317,6 +317,12 @@ def test_valid_unset_optional_ffurf():
     assert ffurf.is_valid()
 
 
+def test_valid_with_untruthy():
+    ffurf = FfurfConfig()
+    ffurf.add_config_key("my-int", key_type=int, default_value=0)
+    assert ffurf.is_valid()
+
+
 def test_values_from_root_dict(fill_ffurf, test_config_root):
     fill_ffurf.from_dict(test_config_root)
 
