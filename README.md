@@ -19,6 +19,9 @@ ffurf.add_config_key("my_almost_secret_key", key_type=int, partial_secret=4)
 ffurf.add_config_key("my_secret_int", key_type=int, secret=True)
 ```
 
+You can specify a key_type which will be used to coerce any potential value for
+the key to the right type when stored.
+
 Keys can be marked as secret, which means that printing or `rich` printing the
 configuration will hide them. Keys can also be marked as partial_secret, which
 will print the last N characters when printing or `rich` printing.
@@ -35,8 +38,18 @@ ffurf.from_env()
 ffurf.from_toml("my_configuration.toml")
 ```
 
+You can also set attributes of the configuration directly if you'd like:
+
+```
+ffurf["my_first_key"] = "hoot"
+```
+
+Setting a non-optional key to `None` will raise a `TypeError`.
+
 ### Validate the configuration
 
 ```
 ffurf.is_valid()
 ```
+
+Currently this will only check that all required keys have been filled.
