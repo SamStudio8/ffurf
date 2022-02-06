@@ -359,3 +359,11 @@ def test_values_are_correctly_overriden_better_than_before(
 ):
     tiered_ffurf.from_dict(test_config_tiers[0], profile="sam")
     _assert_config_values(tiered_ffurf, test_config_tiers[1])
+
+
+def test_update_key_append_source(basic_ffurf):
+    basic_ffurf.set_config_key("my-unset-key", "hoot", source="hoot")
+    basic_ffurf.set_config_key(
+        "my-unset-key", "hoot", source="meow", append_source=True
+    )
+    assert basic_ffurf.config["my-unset-key"]["source"] == "hoot,meow"

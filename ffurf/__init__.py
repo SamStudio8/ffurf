@@ -117,10 +117,13 @@ class FfurfConfig:
                 return False
         return True
 
-    def set_config_key(self, key, value, source=None):
+    def set_config_key(self, key, value, source=None, append_source=False):
         if not source:
             frameinfo = getframeinfo(currentframe().f_back)
             source = self.frame_to_source(frameinfo)
+
+        if append_source and self.config[key]["source"] is not None:
+            source = "%s,%s" % (self.config[key]["source"], source)
 
         if key not in self.config:
             raise KeyError(key)
