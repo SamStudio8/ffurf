@@ -1,5 +1,4 @@
 import pytest
-import toml
 
 from ffurf import FfurfConfig
 
@@ -78,22 +77,6 @@ def test_config_profile():
     }
 
 
-@pytest.fixture
-def toml_config_root(tmpdir_factory, test_config_root):
-    toml_fp = str(tmpdir_factory.mktemp("test_data").join("myconf.toml"))
-    with open(toml_fp, "w") as fh:
-        toml.dump(test_config_root, fh)
-    return toml_fp
-
-
-@pytest.fixture
-def toml_config_default(tmpdir_factory, test_config_default):
-    toml_fp = str(tmpdir_factory.mktemp("test_data").join("myconf.toml"))
-    with open(toml_fp, "w") as fh:
-        toml.dump(test_config_default, fh)
-    return toml_fp
-
-
 def _assert_config(ffurf, key, key_type, value, source=None, source_contains=None):
     assert key in ffurf.config
     assert key in ffurf.config_keys
@@ -104,6 +87,16 @@ def _assert_config(ffurf, key, key_type, value, source=None, source_contains=Non
         assert ffurf.config[key]["source"] == source
     if source_contains:
         assert source_contains in ffurf.config[key]["source"]
+
+
+def _assert_config_values(ffurf, source_d, source_contains_l=None):
+    for key, value in source_d.items():
+        assert ffurf.config[key]["value"] == value
+        if not source_contains_l:
+            source_contains_l = []
+
+        for source_str in source_contains_l:
+            assert source_str in ffurf.config[key]["source"]
 
 
 def test_init_ffurf():
@@ -362,46 +355,4 @@ def test_values_from_profile_dict_override_default_and_root(
         assert fill_ffurf[k] == v
         assert "src" in fill_ffurf.config[k]["source"]
         assert "profile.sam" in fill_ffurf.config[k]["source"]
-    assert fill_ffurf.is_valid()
-
-
-def test_exception_from_missing_toml(fill_ffurf):
-    with pytest.raises(OSError):
-        fill_ffurf.from_toml("missing.toml")
-
-
-# Not going to test the TOML values as we would just be testing that the toml
-# library is working, given we just hand it over to _from_dict which is tested
-def test_values_from_root_toml(fill_ffurf, toml_config_root, test_config_root):
-    fill_ffurf.from_toml(toml_config_root)
-    assert fill_ffurf.is_valid()
-
-
-def test_values_from_default_toml(fill_ffurf, toml_config_root, test_config_default):
-    fill_ffurf.from_toml(toml_config_root)
-    assert fill_ffurf.is_valid()
-
-
-def test_values_from_profile_toml(fill_ffurf, toml_config_root, test_config_profile):
-    fill_ffurf.from_toml(toml_config_root, profile="sam")
-    assert fill_ffurf.is_valid()
-
-
-def test_key_to_envkey():
-    assert FfurfConfig.key_to_envkey("my-str") == "MY_STR"
-    assert FfurfConfig.key_to_envkey("my_str") == "MY_STR"
-    assert FfurfConfig.key_to_envkey("MY_str") == "MY_STR"
-
-
-# Use monkeypatch to safely fiddle with env
-# Only test root env as we don't support anything more clever
-def test_values_from_env(fill_ffurf, test_config_root, monkeypatch):
-
-    for k, v in test_config_root.items():
-        monkeypatch.setenv(FfurfConfig.key_to_envkey(k), str(v))
-
-    fill_ffurf.from_env()
-    for k, v in test_config_root.items():
-        assert fill_ffurf[k] == v
-        assert fill_ffurf.config[k]["source"] == "env:%s" % FfurfConfig.key_to_envkey(k)
     assert fill_ffurf.is_valid()
