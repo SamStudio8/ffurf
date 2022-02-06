@@ -364,10 +364,10 @@ def test_key_to_envkey():
 def test_values_from_env(fill_ffurf, test_config_root, monkeypatch):
 
     for k, v in test_config_root.items():
-        monkeypatch.setenv(fill_ffurf.key_to_envkey(k), str(v))
+        monkeypatch.setenv(FfurfConfig.key_to_envkey(k), str(v))
 
     fill_ffurf.from_env()
     for k, v in test_config_root.items():
         assert fill_ffurf[k] == v
-        assert "env" in fill_ffurf.config[k]["source"]
+        assert fill_ffurf.config[k]["source"] == "env:%s" % FfurfConfig.key_to_envkey(k)
     assert fill_ffurf.is_valid()
