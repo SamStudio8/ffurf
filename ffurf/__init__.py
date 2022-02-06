@@ -119,7 +119,7 @@ class FfurfConfig:
         if key not in self.config:
             raise KeyError(key)
 
-        if not value:
+        if value is None:
             if not self.config[key]["optional"]:
                 raise Exception("%s cannot be null" % key)
         else:
