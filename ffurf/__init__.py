@@ -208,5 +208,5 @@ class FfurfConfig:
             raise OSError()
 
         with open(json_fp) as json_fh:
-            json_config = json.load(json_fp)
+            json_config = json.load(json_fh)
         self._from_dict(json_config, source=json_fp)
