@@ -147,7 +147,7 @@ class FfurfConfig:
 
     @staticmethod
     def frame_to_source(frame):
-        return "src:%s.%d" % (frame.filename.rsplit("ocarina/", 1)[-1], frame.lineno)
+        return "src:%s@L%d" % (frame.filename.rsplit("ocarina/", 1)[-1], frame.lineno)
 
     def from_dict(self, d, source="src", profile=None):
         frameinfo = getframeinfo(currentframe().f_back)
