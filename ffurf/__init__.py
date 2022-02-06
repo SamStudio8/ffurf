@@ -1,6 +1,7 @@
 __VERSION__ = "0.0.2"
 
 import toml
+import json
 import sys
 import os
 
