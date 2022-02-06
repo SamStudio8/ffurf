@@ -351,3 +351,22 @@ def test_values_from_default_toml(fill_ffurf, toml_config_root, test_config_defa
 def test_values_from_profile_toml(fill_ffurf, toml_config_root, test_config_profile):
     fill_ffurf.from_toml(toml_config_root, profile="sam")
     assert fill_ffurf.is_valid()
+
+
+def test_key_to_envkey():
+    assert FfurfConfig.key_to_envkey("my-str") == "MY_STR"
+    assert FfurfConfig.key_to_envkey("my_str") == "MY_STR"
+    assert FfurfConfig.key_to_envkey("MY_str") == "MY_STR"
+
+
+# Use monkeypatch to safely fiddle with env
+def test_values_from_env(fill_ffurf, test_config_root, monkeypatch):
+
+    for k, v in test_config_root.items():
+        monkeypatch.setenv(fill_ffurf.key_to_envkey(k), str(v))
+
+    fill_ffurf.from_env()
+    for k, v in test_config_root.items():
+        assert fill_ffurf[k] == v
+        assert "env" in fill_ffurf.config[k]["source"]
+    assert fill_ffurf.is_valid()

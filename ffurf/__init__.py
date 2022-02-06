@@ -153,9 +153,18 @@ class FfurfConfig:
                         "%s:profile.%s" % (source, profile),
                     )
 
-    # def from_env(self):
-    #    env_d = {k : os.getenv(k) for k in self.config if os.getenv(k)}
-    #    self._from_dict(env_d, "env")
+    @staticmethod
+    def key_to_envkey(k):
+        return "".join([ch if ch.isalnum() else "_" for ch in k]).upper()
+
+    def from_env(self):
+        env_d = {}
+        for k in self.config:
+            env_k = self.key_to_envkey(k)
+            env_v = os.getenv(env_k)
+            if env_v:
+                env_d[k] = env_v
+        self._from_dict(env_d, "env")
 
     def from_toml(self, toml_fp, profile=None):
         if not os.path.exists(toml_fp):
