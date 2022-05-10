@@ -212,6 +212,31 @@ class FfurfConfig:
     def to_dictstr(self, default=""):
         return str({k: self.get(k, default="") for k in self})
 
+    # TODO test
+    def to_groovy(self, default=""):
+        head = "params {"
+        tail = "}"
+        lines = [head]
+        for k in self:
+            v = self.get(k, default="")
+            if type(v) == str:
+                if v == "":
+                    # empty strings to null
+                    v = "null"
+                else:
+                    v = f'"{v}"'
+            elif type(v) == None:
+                v = "null"
+            elif type(v) == bool:
+                if v:
+                    v = "true"
+                else:
+                    v = "false"
+            lines.append(f"    {k} = {v}")
+
+        lines.append(tail)
+        return '\n'.join(lines)
+
     def from_toml(self, toml_fp, profile=None):
         if not os.path.exists(toml_fp):
             sys.stderr.write("Could not open toml: %s\n" % toml_fp)
