@@ -1,5 +1,6 @@
 __VERSION__ = "0.1.4"
 
+import argparse
 import toml
 import json
 import sys
@@ -236,6 +237,18 @@ class FfurfConfig:
 
         lines.append(tail)
         return '\n'.join(lines)
+
+    # TODO test
+    def to_argparse(self, default=""):
+        parser = argparse.ArgumentParser(add_help=False)
+        for k, v in self.config.items():
+            default_str = f" [default: {v['value']}]" if v["value"] is not None else ""
+            parser.add_argument(f"--{k}",
+                type=v["type"],
+                required=not v["optional"] and v["value"] is None,
+                default=v["value"],
+                help=""+default_str)
+        return parser
 
     def from_toml(self, toml_fp, profile=None):
         if not os.path.exists(toml_fp):
