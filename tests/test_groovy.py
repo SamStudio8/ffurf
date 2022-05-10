@@ -12,7 +12,7 @@ def basic_ffurf_res():
     return """params {
     my-int = 800
     my-str = "hoot"
-    my-unset-key = ""
+    my-unset-key = null
     my-zero = 0
     one-to-zero = 1
 }"""
