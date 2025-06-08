@@ -13,6 +13,7 @@ and this project adheres to [0-based versioning](https://0ver.org/).
 * `to_argparse` will output an `argparse.ArgumentParser` built from the
   Ffurf configuration, complete with defaults if the structure is already
   populated
+* `load` will infer an appropriate from_x Ffurf loader.
 
 ## 0.1.4
 ### Added

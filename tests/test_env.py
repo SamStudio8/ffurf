@@ -22,3 +22,15 @@ def test_values_from_env(fill_ffurf, test_config_root, monkeypatch):
         assert fill_ffurf[k] == v
         assert fill_ffurf.config[k]["source"] == "env:%s" % FfurfConfig.key_to_envkey(k)
     assert fill_ffurf.is_valid()
+
+# test with load instead
+def test_values_from_env_via_load(fill_ffurf, test_config_root, monkeypatch):
+
+    for k, v in test_config_root.items():
+        monkeypatch.setenv(FfurfConfig.key_to_envkey(k), str(v))
+
+    fill_ffurf.load()
+    for k, v in test_config_root.items():
+        assert fill_ffurf[k] == v
+        assert fill_ffurf.config[k]["source"] == "env:%s" % FfurfConfig.key_to_envkey(k)
+    assert fill_ffurf.is_valid()

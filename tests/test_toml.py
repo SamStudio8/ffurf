@@ -25,3 +25,9 @@ def test_values_from_profile_toml(tiered_ffurf, test_config_tiers, toml_config):
     tiered_ffurf.from_toml(toml_config, profile="sam")
     _assert_config_values(tiered_ffurf, test_config_tiers[1])
     assert tiered_ffurf.is_valid()
+
+
+def test_values_from_profile_toml_via_load(tiered_ffurf, test_config_tiers, toml_config):
+    tiered_ffurf.load(toml_config, profile="sam")
+    _assert_config_values(tiered_ffurf, test_config_tiers[1])
+    assert tiered_ffurf.is_valid()

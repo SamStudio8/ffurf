@@ -159,6 +159,22 @@ class FfurfConfig:
     def frame_to_source(frame):
         return "src:%s@L%d" % (frame.filename.rsplit("ocarina/", 1)[-1], frame.lineno)
 
+    def load(self, thing=None, **kwargs):
+        if not thing:
+            self.from_env(**kwargs)
+        elif isinstance(thing, dict):
+            self.from_dict(thing, **kwargs)
+        elif isinstance(thing, str):
+            if thing.endswith("toml"):
+                self.from_toml(thing, **kwargs)
+            elif thing.endswith("json"):
+                self.from_json(thing, **kwargs)
+            else:
+                raise ValueError("Unknown file config type: %s" % thing)
+        else:
+            raise TypeError("Could not infer loader for %s" % type(thing))
+        return self
+
     def from_dict(self, d, source="src", profile=None):
         frameinfo = getframeinfo(currentframe().f_back)
         source = self.frame_to_source(frameinfo)

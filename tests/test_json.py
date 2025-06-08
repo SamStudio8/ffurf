@@ -25,3 +25,9 @@ def test_values_from_profile_json(tiered_ffurf, test_config_tiers, json_config):
     tiered_ffurf.from_json(json_config, profile="sam")
     _assert_config_values(tiered_ffurf, test_config_tiers[1])
     assert tiered_ffurf.is_valid()
+
+
+def test_values_from_profile_json_via_load(tiered_ffurf, test_config_tiers, json_config):
+    tiered_ffurf.load(json_config, profile="sam")
+    _assert_config_values(tiered_ffurf, test_config_tiers[1])
+    assert tiered_ffurf.is_valid()
