@@ -53,6 +53,7 @@ class FfurfConfig:
         table.add_column("Key")
         table.add_column("Value")
         table.add_column("Source")
+        table.add_column("Valid")
 
         for k in self:
 
@@ -66,9 +67,40 @@ class FfurfConfig:
                 v = "[b red]--------[/]"
                 source = "%s [b red](blank)[/]" % source
 
-            table.add_row(k, v, source)
+            valid = "[green]O[/]" if self.key_is_valid(k) else "[red]X[/]"
+            table.add_row(k, v, source, valid)
 
         yield table
+
+    def print_table(self):
+        rows = []
+        for k in self:
+            v = self.get_clean(k)
+            source = self.get_source(k)
+            if not self.config[k]["optional"] and self[k] is None:
+                v = "--------"
+                source = "unset"
+            elif not self.config[k]["optional"] and self[k] == "":
+                v = "--------"
+                source = f"{source} (blank)"
+            valid = "O" if self.key_is_valid(k) else "X"
+            rows.append((k, v, source, valid))
+
+        headers = ("Key", "Value", "Source", "Valid")
+
+        col_widths = [len(h) for h in headers]
+        for row in rows:
+            for col, cell in enumerate(row):
+                l = len(str(cell))
+                if l > col_widths[col]:
+                    col_widths[col] = l
+
+        header_row = "  ".join(h.ljust(col_widths[i]) for i, h in enumerate(headers))
+        print(header_row.strip())
+        print("  ".join("=" * col_widths[i] for i in range(len(headers))))
+        for row in rows:
+            cells = [str(cell).ljust(col_widths[i]) for i, cell in enumerate(row)]
+            print("  ".join(cells).strip())
 
     def __getitem__(self, k):
         if k not in self.config_keys:
@@ -119,13 +151,26 @@ class FfurfConfig:
             return "********" + self[k][-self.config[k]["partial_secret"] :]
         return str(self[k])
 
+    def key_is_valid(self, k):
+        if k not in self.config_keys:
+            raise KeyError(k)
+        k, v = k, self.config[k]
+        if v["value"] is None and not v["optional"]:
+            return False
+        if v["value"] == "" and not v["optional"] and v["type"] is str:
+            return False
+        return True
+
     def is_valid(self):
         for k, v in self.config.items():
-            if v["value"] is None and not v["optional"]:
-                return False
-            if v["value"] == "" and not v["optional"] and v["type"] is str:
+            if not self.key_is_valid(k):
                 return False
         return True
+
+    def validate(self):
+        if not self.is_valid():
+            self.print_table()
+            sys.exit(os.EX_CONFIG)
 
     def set_config_key(self, key, value, source=None, append_source=False):
         if not source:

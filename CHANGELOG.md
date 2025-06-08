@@ -14,6 +14,7 @@ and this project adheres to [0-based versioning](https://0ver.org/).
   Ffurf configuration, complete with defaults if the structure is already
   populated
 * `load` will infer an appropriate from_x Ffurf loader.
+* `validate` will explode and print out a table when misconfigured.
 
 ## 0.1.4
 ### Added

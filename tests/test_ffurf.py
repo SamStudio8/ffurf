@@ -372,3 +372,23 @@ def test_update_key_append_source(basic_ffurf):
 def test_empty_string_is_invalid(basic_ffurf):
     basic_ffurf.set_config_key("my-unset-key", "", source="hoot")
     assert not basic_ffurf.is_valid()
+
+def test_table(basic_ffurf, capfd):
+    basic_ffurf.print_table()
+    out, err = capfd.readouterr()
+    assert out == (
+        "Key           Value     Source                                                       Valid\n"
+        "============  ========  ===========================================================  =====\n"
+        "my-int        800       src:/mnt/c/Users/Sam/Projects/ffurf/tests/test_ffurf.py@L16  O\n"
+        "my-str        hoot      src:/mnt/c/Users/Sam/Projects/ffurf/tests/test_ffurf.py@L15  O\n"
+        "my-unset-key  --------  unset                                                        X\n"
+        "my-zero       0         ffurf:default                                                O\n"
+        "one-to-zero   1         ffurf:default                                                O\n"
+    )
+
+def test_validate(basic_ffurf, capfd):
+    with pytest.raises(SystemExit) as e:
+        basic_ffurf.validate()
+    out, err = capfd.readouterr()
+    assert "Key           Value     Source                                                       Valid\n" in out
+    assert e.value.code == 78
