@@ -1,4 +1,4 @@
-__VERSION__ = "0.1.4"
+__VERSION__ = "0.1.5"
 
 import argparse
 import toml
@@ -7,8 +7,6 @@ import sys
 import os
 
 from inspect import currentframe, getframeinfo
-
-from rich.table import Table
 
 
 class FfurfConfig:
@@ -46,6 +44,10 @@ class FfurfConfig:
 
     # TODO test
     def __rich_console__(self, console, options):
+        try:
+            from rich.table import Table
+        except ImportError:
+            raise RuntimeError("Optional dependency 'rich' is required for pretty-printing. Install with: pip install rich")
         # Print as a nice table
         table = Table(title="Configuration", show_lines=False)
         table.add_column("Key")

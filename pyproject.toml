@@ -8,7 +8,9 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.9"
 toml = "^0.10.2"
-rich = "^11.1.0"
+
+[tool.poetry.extras]
+rich = ["rich"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.0"
