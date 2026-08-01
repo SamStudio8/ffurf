@@ -6,7 +6,7 @@ authors = [{ name = "Sam Nicholls", email = "sam@samnicholls.net" }]
 license = "MIT"
 license-files = ["LICENSE"]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = ["toml>=0.10.2"]
 
 [project.optional-dependencies]

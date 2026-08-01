@@ -13,6 +13,7 @@ and this project adheres to [0-based versioning](https://0ver.org/).
   from a string, and to join it again for `to_env`. Setting on a non-list key
   raises a `ValueError`.
 ### Changed
+* The minimum python version is now 3.10.
 * Packaging moved from poetry to `uv` and `hatchling`, with dependencies
   declared as PEP 621 metadata and pinned in `uv.lock`.
 ### Fixed
