@@ -206,7 +206,8 @@ class FfurfConfig:
 
     @staticmethod
     def frame_to_source(frame):
-        return "src:%s@L%d" % (frame.filename.rsplit("ocarina/", 1)[-1], frame.lineno)
+        filename = frame.filename.rsplit("ffurf/", 1)[-1].rsplit("ffurf\\", 1)[-1]
+        return "src:%s@L%d" % (filename, frame.lineno)
 
     def load(self, thing=None, **kwargs):
         if not thing:

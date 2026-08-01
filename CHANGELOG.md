@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [0-based versioning](https://0ver.org/).
 
 ## 0.3.0
+### Changed
 * Packaging moved from poetry to `uv` and `hatchling`, with dependencies
   declared as PEP 621 metadata and pinned in `uv.lock`.
+### Fixed
+* Various test weirdness caused by my brain evidently not working.
 
 ## 0.2.0
 ### Changed
