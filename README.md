@@ -6,14 +6,28 @@ Pronounced "furv" after the Welsh word for "form" or "shape" (and short for the 
 
 ## How do I install it?
 
+`ffurf` isn't on PyPI, so install it from the repository:
+
 ```
-pip install ffurf
+pip install git+https://github.com/SamStudio8/ffurf.git
 ```
 
 Pretty-printing with `rich` is an optional extra:
 
 ```
-pip install ffurf[rich]
+pip install "ffurf[rich] @ git+https://github.com/SamStudio8/ffurf.git"
+```
+
+Pin a particular version by adding a tag, branch or commit:
+
+```
+pip install git+https://github.com/SamStudio8/ffurf.git@0.3.0
+```
+
+With `uv`, add it to your project with:
+
+```
+uv add git+https://github.com/SamStudio8/ffurf.git
 ```
 
 ## How do I use it?
