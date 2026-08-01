@@ -1,4 +1,4 @@
-__VERSION__ = "0.1.5"
+__VERSION__ = "0.2.0"
 
 import argparse
 import toml
