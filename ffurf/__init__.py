@@ -6,11 +6,42 @@ import os
 
 from importlib.metadata import version, PackageNotFoundError
 from inspect import currentframe, getframeinfo
+from typing import get_args, get_origin
 
 try:
     __VERSION__ = version("ffurf")
 except PackageNotFoundError:
     __VERSION__ = "0.0.0-dev"
+
+
+def list_elem_type(key_type):
+    # Returns (is_list, elem_type) for list, list[x] and List[x] key types.
+    # elem_type is None for a bare list, where elements are left as-is.
+    if key_type is list:
+        return True, None
+    if get_origin(key_type) is list:
+        args = get_args(key_type)
+        return True, args[0] if args else None
+    return False, None
+
+
+def coerce_value(key_type, value, separator=","):
+    is_list, elem_type = list_elem_type(key_type)
+    if not is_list:
+        return key_type(value)
+
+    if isinstance(value, str):
+        # env vars and scalar strings arrive as one separated string
+        value = [v.strip() for v in value.split(separator)] if value.strip() else []
+    elif isinstance(value, (list, tuple)):
+        value = list(value)
+    else:
+        # a lone scalar is a list of one
+        value = [value]
+
+    if elem_type is not None:
+        value = [elem_type(v) for v in value]
+    return value
 
 
 class FfurfConfig:
@@ -26,16 +57,26 @@ class FfurfConfig:
         secret=False,
         partial_secret=None,
         optional=False,
+        separator=",",
     ):
+        is_list, _ = list_elem_type(key_type)
+        if separator != "," and not is_list:
+            raise ValueError(
+                "%s: separator is only meaningful for list keys, not %s"
+                % (key, key_type)
+            )
 
         self.config[key] = {
             "name": key,
             "type": key_type,
-            "value": key_type(default_value) if default_value is not None else None,
+            "value": coerce_value(key_type, default_value, separator)
+            if default_value is not None
+            else None,
             "source": "ffurf:default" if default_value is not None else None,
             "secret": secret,
             "partial_secret": partial_secret if not secret else None,
             "optional": optional,
+            "separator": separator,
         }
         self.config_keys.add(key)
 
@@ -67,7 +108,7 @@ class FfurfConfig:
             if not self.config[k]["optional"] and self[k] is None:
                 v = "[b red]--------[/]"
                 source = "[b red]unset[/]"
-            elif not self.config[k]["optional"] and self[k] == "":
+            elif not self.config[k]["optional"] and self[k] in ("", []):
                 v = "[b red]--------[/]"
                 source = "%s [b red](blank)[/]" % source
 
@@ -84,7 +125,7 @@ class FfurfConfig:
             if not self.config[k]["optional"] and self[k] is None:
                 v = "--------"
                 source = "unset"
-            elif not self.config[k]["optional"] and self[k] == "":
+            elif not self.config[k]["optional"] and self[k] in ("", []):
                 v = "--------"
                 source = f"{source} (blank)"
             valid = "O" if self.key_is_valid(k) else "X"
@@ -146,14 +187,21 @@ class FfurfConfig:
         if k not in self.config_keys:
             raise KeyError(k)
 
-        if self[k] is None:
+        v = self[k]
+        if v is None:
             return ""
 
         if self.config[k]["secret"]:
             return "********"
-        elif self.config[k]["partial_secret"]:
-            return "********" + self[k][-self.config[k]["partial_secret"] :]
-        return str(self[k])
+
+        if isinstance(v, list):
+            v = self.config[k]["separator"].join(str(i) for i in v)
+        else:
+            v = str(v)
+
+        if self.config[k]["partial_secret"]:
+            return "********" + v[-self.config[k]["partial_secret"] :]
+        return v
 
     def key_is_valid(self, k):
         if k not in self.config_keys:
@@ -162,6 +210,8 @@ class FfurfConfig:
         if v["value"] is None and not v["optional"]:
             return False
         if v["value"] == "" and not v["optional"] and v["type"] is str:
+            return False
+        if v["value"] == [] and not v["optional"]:
             return False
         return True
 
@@ -192,10 +242,13 @@ class FfurfConfig:
                 raise TypeError("%s cannot be None" % key)
         else:
             try:
-                key_type = self.config[key]["type"]
-                value = key_type(value)
-            except:
-                raise TypeError(key)
+                value = coerce_value(
+                    self.config[key]["type"],
+                    value,
+                    self.config[key]["separator"],
+                )
+            except (TypeError, ValueError) as e:
+                raise TypeError(key) from e
 
         self.config[key].update(
             {
@@ -274,7 +327,10 @@ class FfurfConfig:
     def to_env(self, default=""):
         env_lines = []
         for k in self:
-            env_lines.append('%s="%s"' % (self.key_to_envkey(k), str(self[k])))
+            v = self[k]
+            if isinstance(v, list):
+                v = self.config[k]["separator"].join(str(i) for i in v)
+            env_lines.append('%s="%s"' % (self.key_to_envkey(k), str(v)))
         return "\n".join(env_lines)
 
     # TODO test
@@ -288,7 +344,11 @@ class FfurfConfig:
         lines = [head]
         for k in self:
             v = self.get(k, default="")
-            if type(v) == str:
+            if isinstance(v, list):
+                v = "[%s]" % ", ".join(
+                    f'"{i}"' if isinstance(i, str) else str(i) for i in v
+                )
+            elif type(v) == str:
                 if v == "":
                     # empty strings to null
                     v = "null"
@@ -311,11 +371,19 @@ class FfurfConfig:
         parser = argparse.ArgumentParser(add_help=False)
         for k, v in self.config.items():
             default_str = f" [default: {v['value']}]" if v["value"] is not None else ""
-            parser.add_argument(f"--{k}",
-                type=v["type"],
+            is_list, elem_type = list_elem_type(v["type"])
+            type_kwargs = (
+                {"type": elem_type or str, "nargs": "*"}
+                if is_list
+                else {"type": v["type"]}
+            )
+            parser.add_argument(
+                f"--{k}",
                 required=not v["optional"] and v["value"] is None,
                 default=v["value"],
-                help=""+default_str)
+                help="" + default_str,
+                **type_kwargs,
+            )
         return parser
 
     def from_toml(self, toml_fp, profile=None):

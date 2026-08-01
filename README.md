@@ -35,6 +35,44 @@ ffurf.add_config_key("my_secret_int", key_type=int, secret=True)
 You can specify a key_type which will be used to coerce any potential value for
 the key to the right type when stored.
 
+### Lists
+
+Keys can hold lists. Use `list` to keep elements as they arrive, or
+`list[str]`, `list[int]` and so on to coerce each element:
+
+```python
+ffurf.add_config_key("my_list", key_type=list[str])
+ffurf.add_config_key("my_ints", key_type=list[int])
+ffurf.add_config_key("my_anything", key_type=list)
+```
+
+Lists in `toml` and `json` are read as lists:
+
+```toml
+my_list = ["hoot", "meow"]
+```
+
+Environments can only hold strings, so a list read from the environment (or
+set from a string) is split on a separator, defaulting to a comma:
+
+```python
+os.environ["MY_LIST"] = "hoot,meow"
+ffurf.from_env()  # ["hoot", "meow"]
+```
+
+The separator is configurable per key, and is also used when writing the
+list back out with `to_env`:
+
+```python
+ffurf.add_config_key("my_paths", key_type=list[str], separator=":")
+```
+
+A separator only means something for a list key, so setting one on any other
+key type raises a `ValueError` rather than being quietly ignored.
+
+A lone value is stored as a list of one. An empty list is treated like an
+empty string, so a non-optional key holding one is not valid.
+
 Keys can be marked as secret, which means that printing or `rich` printing the
 configuration will hide them. Keys can also be marked as partial_secret, which
 will print the last N characters when printing or `rich` printing.

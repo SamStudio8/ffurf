@@ -5,11 +5,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [0-based versioning](https://0ver.org/).
 
 ## 0.3.0
+### Added
+* Config keys correctly hold lists. `key_type=list` keeps elements as defined,
+  `key_type=list[str]` (or `list[int]`, `typing.List[str]`, ...) coerces each
+  element to the defined type.
+* `add_config_key` takes a `separator` (default `,`) used to split a list read
+  from a string, and to join it again for `to_env`. Setting on a non-list key
+  raises a `ValueError`.
 ### Changed
 * Packaging moved from poetry to `uv` and `hatchling`, with dependencies
   declared as PEP 621 metadata and pinned in `uv.lock`.
 ### Fixed
 * Various test weirdness caused by my brain evidently not working.
+* List values are no longer stringified into `"['x', 'y']"` when loaded from
+  `toml` or `json`.
+* `from_env` splits list keys instead of exploding the string into characters.
+* `frame_to_source` trimmed paths incorrectly, so the reported source was
+  always an absolute path.
 
 ## 0.2.0
 ### Changed
