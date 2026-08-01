@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [0-based versioning](https://0ver.org/).
 
+## 0.3.0
+* Packaging moved from poetry to `uv` and `hatchling`, with dependencies
+  declared as PEP 621 metadata and pinned in `uv.lock`.
+
 ## 0.2.0
 ### Changed
 * Updated the minimum python version.

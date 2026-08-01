@@ -4,6 +4,18 @@ Pronounced "furv" after the Welsh word for "form" or "shape" (and short for the 
 `ffurf` will work as a drop-in replacement for any use-case where you're reading and writing configuration data to and from a `dict`, because it is just a dictionary with some extra utility functions.
 `ffurf` is yet another configuration parser and is just a cleaned up version of the code I write over and over for small projects. There is almost certainly [a bigger and better library](http://dynaconf.com/) but I make `ffurf` available in the hope it might be useful to someone who wants a small and non-intrusive way to handle very simple configurations.
 
+## How do I install it?
+
+```
+pip install ffurf
+```
+
+Pretty-printing with `rich` is an optional extra:
+
+```
+pip install ffurf[rich]
+```
+
 ## How do I use it?
 
 ### Define a configuration
@@ -125,4 +137,31 @@ Print the configuration into a pretty, secret-sanitised table:
 ```python
 from rich import print as rich_print
 rich_print(ffurf)
+```
+
+## How do I develop it?
+
+`ffurf` is managed with [uv](https://docs.astral.sh/uv/). To set up an
+environment with the dev dependencies and optional extras:
+
+```
+uv sync --all-extras
+```
+
+Run the tests:
+
+```
+uv run pytest
+```
+
+Install the pre-commit hooks:
+
+```
+uv run pre-commit install
+```
+
+Build a wheel and sdist into `dist/`:
+
+```
+uv build
 ```

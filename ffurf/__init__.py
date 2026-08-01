@@ -1,12 +1,16 @@
-__VERSION__ = "0.2.0"
-
 import argparse
 import toml
 import json
 import sys
 import os
 
+from importlib.metadata import version, PackageNotFoundError
 from inspect import currentframe, getframeinfo
+
+try:
+    __VERSION__ = version("ffurf")
+except PackageNotFoundError:
+    __VERSION__ = "0.0.0-dev"
 
 
 class FfurfConfig:
